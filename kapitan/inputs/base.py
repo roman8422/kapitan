@@ -66,7 +66,10 @@ class InputType(object):
 
         logger.debug("Compiling %s", input_path)
         try:
-            _compile_path = os.path.join(self.compile_path, target_name, output_path)
+            if kwargs['tree_style_output']:
+                _compile_path = os.path.join(self.compile_path, output_path)
+            else:
+                _compile_path = os.path.join(self.compile_path, target_name, output_path)
             self.compile_file(
                 input_path,
                 _compile_path,
@@ -161,6 +164,13 @@ class CompiledFile(object):
 
         # make sure directory for file exists
         os.makedirs(os.path.dirname(self.name), exist_ok=True)
+
+        # throw exception if tree-style-output is True and file in the tree already exists
+        if os.path.exists(self.name):
+            raise CompileError(
+                "Compile error: file {} already exists. Will not overwrite. "
+                "Most likely more than one target has the same output directory.".format(self.name)
+            )
 
         self.fp = open(self.name, mode)
         return CompilingFile(self, self.fp, self.ref_controller, **self.kwargs)

@@ -165,13 +165,6 @@ class CompiledFile(object):
         # make sure directory for file exists
         os.makedirs(os.path.dirname(self.name), exist_ok=True)
 
-        # throw exception if tree-style-output is True and file in the tree already exists
-        if os.path.exists(self.name):
-            raise CompileError(
-                "Compile error: file {} already exists. Will not overwrite. "
-                "Most likely more than one target has the same output directory.".format(self.name)
-            )
-
         self.fp = open(self.name, mode)
         return CompilingFile(self, self.fp, self.ref_controller, **self.kwargs)
 
